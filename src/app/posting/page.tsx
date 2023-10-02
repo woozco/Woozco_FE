@@ -1,77 +1,50 @@
-"use client"
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+"use client";
+import React, { useEffect, useState } from "react";
+import { AxiosResponse } from "axios";
+import { getAllBoard } from "../apis/api/board/board";
+import { PostBoardData } from "../apis/api/board/types";
+import Link from "next/link";
+import CustomButton from "../components/Custombutton";
 
-interface Post {
-  id: number;
-  title: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  linkOfProblem: string;
-  wantLanguage: string;
-  body: string;
-}
+const BoardsPage: React.FC = () => {
+    const [boardData, setBoardData] = useState<PostBoardData[]>([]);
 
-const getWantMento = async () => {
-  const response = await axios.get<Post[]>('http://localhost:4000/WantMento');
-  return response.data;
+    useEffect(() => {
+        // 페이지가 로드될 때 getAllBoard 함수를 호출하여 게시판 데이터를 가져옴
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const response: AxiosResponse = await getAllBoard();
+            // API에서 받은 데이터를 상태에 저장
+            setBoardData(response.data);
+        } catch (error) {
+            console.error("데이터 가져오기 오류:", error);
+        }
+    };
+
+    return (
+        <div>
+            <h1>게시판</h1>
+            {boardData.map((board) => (
+                <div key={board.id}>
+                    <h2>{board.title}</h2>
+                    <p>{board.type}</p>
+                    <p>{board.body}</p>
+                    <p>{board.date}</p>
+                    <p>{board.startTime}</p>
+                    <p>{board.endTime}</p>
+                    <p>{board.linkOfProblem}</p>
+                    <p>{board.wantLanguage}</p>
+                    <br></br>
+                </div>
+            ))}
+            <Link href="/posting/writing">
+                <CustomButton buttonText="게시물 쓰기" />
+            </Link>
+        </div>
+    );
 };
 
-const getWantMentee = async () => {
-  const response = await axios.get<Post[]>('http://localhost:4000/WantMentee');
-  return response.data;
-};
-
-const Posting: React.FC = () => {
-  const [wantMento, setWantMento] = useState<Post[]>([]);
-  const [wantMentee, setWantMentee] = useState<Post[]>([]);
-
-  useEffect(() => {
-    // 데이터를 가져와서 상태에 설정
-    getWantMento().then((data) => setWantMento(data));
-    getWantMentee().then((data) => setWantMentee(data));
-  }, []);
-
-  return (
-    <div>
-      <h1>게시판</h1>
-      <br></br>
-      <h2>Want Mento</h2>
-      <ul>
-        {wantMento.map((post) => (
-          <li key={post.id}>
-            <h3>{post.title}</h3>
-            <p>Date: {post.date}</p>
-            <p>Start Time: {post.startTime}</p>
-            <p>End Time: {post.endTime}</p>
-            <p>
-              Link of Problem: <a href={post.linkOfProblem}>{post.linkOfProblem}</a>
-            </p>
-            <p>Want Language: {post.wantLanguage}</p>
-            <p>Body: {post.body}</p>
-          </li>
-        ))}
-      </ul>
-      <br></br>
-      <h2>Want Mentee</h2>
-      <ul>
-        {wantMentee.map((post) => (
-          <li key={post.id}>
-            <h3>{post.title}</h3>
-            <p>Date: {post.date}</p>
-            <p>Start Time: {post.startTime}</p>
-            <p>End Time: {post.endTime}</p>
-            <p>
-              Link of Problem: <a href={post.linkOfProblem}>{post.linkOfProblem}</a>
-            </p>
-            <p>Want Language: {post.wantLanguage}</p>
-            <p>Body: {post.body}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-export default Posting;
+export default BoardsPage;

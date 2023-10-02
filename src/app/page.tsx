@@ -10,6 +10,13 @@ const Home: NextPage = () => {
         <Link href="/register">
             <Custombutton buttonText='회원가입' />
         </Link>
+        <Link href="/login">
+            <Custombutton buttonText='로그인' />
+        </Link>
+        <Link href="/posting">
+            <Custombutton buttonText='게시판' />
+        </Link>
+        
       </>
     )
 }

@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { apiInstance } from "../../utils/createAxioInstance";
+import apiInstance  from "../../utils/createAxioInstance";
 import { PostRegisterData, PostLoginData, PostChangePWData } from "./types"
 
 export async function postRegisterRequest(postRegisterData: PostRegisterData): Promise<void> {
