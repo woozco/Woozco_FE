@@ -16,7 +16,6 @@ const Home: NextPage = () => {
         <Link href="/posting">
             <Custombutton buttonText='게시판' />
         </Link>
-        
       </>
     )
 }
