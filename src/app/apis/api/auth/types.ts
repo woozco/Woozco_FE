@@ -1,6 +1,5 @@
 export interface PostRegisterData {
     name: string;
-    age: number;
     email: string;
     password: string;
 }

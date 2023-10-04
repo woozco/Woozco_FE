@@ -63,9 +63,9 @@ const LoginForm: React.FC = () => {
           required
         />
         <Custombutton buttonText='로그인' />
-       
-          <Custombutton buttonText='회원가입' />
-  
+        <Link href="/register">
+            <Custombutton buttonText='회원가입' />
+        </Link> 
         {responseMessage && <p className="mt-4 text-green-600">{responseMessage}</p>}
       </form>
     </div>

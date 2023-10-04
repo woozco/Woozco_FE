@@ -11,7 +11,6 @@ const RegisterForm: React.FC = () => {
   const SUBITFORM="/login"
   const [formData, setFormData] = useState({
     name: '',
-    age: '',
     email: '',
     password: '',
   });
@@ -29,7 +28,6 @@ const RegisterForm: React.FC = () => {
       // postRegisterRequest 함수 호출
       const response = await postRegisterRequest({
         name: formData.name,
-        age: Number(formData.age),
         email: formData.email,
         password: formData.password,
       });
@@ -59,15 +57,6 @@ const RegisterForm: React.FC = () => {
             required
           />
           <InputOneLine
-            label="나이"
-            id="age"
-            name="age"
-            value={formData.age}
-            onChange={handleInputChange}
-            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-            required
-          />
-          <InputOneLine
             label="이메일"
             id="email"
             name="email"
@@ -86,9 +75,9 @@ const RegisterForm: React.FC = () => {
             required
           />
         </div>
-        <Link href={SUBITFORM}>
+
             <Custombutton buttonText='등록'></Custombutton>
-        </Link>
+
         {responseMessage && <p className="mt-4 text-green-600">{responseMessage}</p>}
       </form>
     </div>
