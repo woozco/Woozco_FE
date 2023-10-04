@@ -61,32 +61,28 @@ const BoardForm: React.FC = () => {
                         required
                     />
                     <InputOneLine
-                        label="날짜"
-                        id="date"
-                        name="date"
-                        value={formData.date}
+                        label="멘토/멘티"
+                        id="type"
+                        name="type"
+                        value={formData.type}
                         onChange={handleInputChange}
                         className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
                         required
                     />
-                    <InputOneLine
-                        label="시작 시간"
-                        id="startTime"
-                        name="startTime"
-                        value={formData.startTime}
-                        onChange={handleInputChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-                        required
-                    />
-                    <InputOneLine
-                        label="종료 시간"
-                        id="endTime"
-                        name="endTime"
-                        value={formData.endTime}
-                        onChange={handleInputChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-                        required
-                    />
+                    <div>
+                        <label htmlFor="date">날짜:</label>
+                        <input type="date" id="date" name="date" value={formData.date} onChange={handleInputChange} />
+                    </div>
+
+                    <div>
+                        <label htmlFor="startTime">시작 시간:</label>
+                        <input type="time" id="startTime" name="startTime" value={formData.startTime} onChange={handleInputChange} />
+                    </div>
+
+                    <div>
+                        <label htmlFor="endTime">종료 시간:</label>
+                        <input type="time" id="endTime" name="endTime" value={formData.endTime} onChange={handleInputChange} />
+                    </div>
                     <InputOneLine
                         label="문제 링크"
                         id="linkOfProblem"
@@ -115,9 +111,7 @@ const BoardForm: React.FC = () => {
                         required
                     />
                 </div>
-                <Link href={SUBMIT_FORM}>
-                    <Custombutton buttonText="등록"></Custombutton>
-                </Link>
+                <Custombutton buttonText="등록"/>
                 {responseMessage && (
                     <p className="mt-4 text-green-600">{responseMessage}</p>
                 )}
