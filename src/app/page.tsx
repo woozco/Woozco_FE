@@ -16,6 +16,15 @@ const Home: NextPage = () => {
         <Link href="/posting">
             <Custombutton buttonText='게시판' />
         </Link>
+        <Link href="/room/create">
+            <Custombutton buttonText='방 만들기' />
+        </Link>
+        <Link href="/room/entrance">
+            <Custombutton buttonText='방 입장' />
+        </Link>
+        <Link href="/room/list">
+            <Custombutton buttonText='방 목록' />
+        </Link>
       </>
     )
 }
