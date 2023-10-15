@@ -8,7 +8,7 @@ import CustomButton from "../Custombutton";
 const RoomController: React.FC = () => {
     const router = useRouter()
     const [socket, setSocket] = useState<Socket | null>(null);
-    const [room, setRoom] = useState<string>("default");
+    const [room, setRoom] = useState<string>("");
 
     useEffect(() => {
         setSocket(socketInstance);
@@ -39,13 +39,13 @@ const RoomController: React.FC = () => {
     }, [socketInstance]);
 
     return (
-        <div>
+        <div className="list-container">
             <input
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
                 placeholder="Enter room name"
             />
-            <CustomButton onClick={()=>joinRoom} buttonText="방 입장"></CustomButton>
+            <CustomButton onClick={()=>joinRoom} buttonText="방 입장"/>
         </div>
     );
 };

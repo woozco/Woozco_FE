@@ -8,7 +8,7 @@ const ListCaller = () => {
     const [rooms, setRooms] = useState<string[]>([]);
     const router = useRouter()
 
-    const joinRoom = (room : string) : void => {
+    const joinRoom = (room: string): void => {
         socketInstance.emit("joinRoom", room);
         socketInstance.emit("getClientsInRoom", room);
         router.push(`/room/${room}`)
@@ -21,23 +21,21 @@ const ListCaller = () => {
         });
 
         return () => {
-            
+
         };
     }, []);
 
     return (
         <div>
-            <h1>너가 입장 가능한 방</h1>
             <br></br>
-            <ul>
+            <div className="list-container">
                 {rooms.map((name) => (
-                    <div className="flex mt-3 gap-2">
-                        <li key={name}>{name}</li>
-                        <CustomButton onClick={()=> joinRoom(name)} buttonText={"입장"}></CustomButton>
+                    <div className="list-item">
+                        <a>{name}</a>
+                        <CustomButton onClick={() => joinRoom(name)} buttonText={"입장"}></CustomButton>
                     </div>
-                   
                 ))}
-            </ul>
+            </div>
         </div>
     );
 };

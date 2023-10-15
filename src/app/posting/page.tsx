@@ -26,20 +26,22 @@ const BoardsPage: React.FC = () => {
 
     return (
         <div>
-            <h1>게시판</h1>
-            {boardData.map((board) => (
-                <div key={board.id}>
-                    <h2>{board.title}</h2>
-                    <p>{board.type}</p>
-                    <p>{board.body}</p>
-                    <p>{board.date}</p>
-                    <p>{board.startTime}</p>
-                    <p>{board.endTime}</p>
-                    <p>{board.linkOfProblem}</p>
-                    <p>{board.wantLanguage}</p>
-                    <br></br>
-                </div>
-            ))}
+                <br></br>
+                {boardData.map((board) => (
+                    <div className="post" key={board.id}>
+                        <div className="post-content">
+                            <h2 className="post-author">{board.title}</h2>
+                            <p className="post-text">{board.type}</p>
+                            <p className="post-text">{board.body}</p>
+                            <p className="post-text">{board.date}</p>
+                            <p className="post-text">{board.startTime}</p>
+                            <p className="post-text">{board.endTime}</p>
+                            <p className="post-text">{board.linkOfProblem}</p>
+                            <p className="post-text">{board.wantLanguage}</p>
+                            <br></br>
+                        </div>
+                    </div>
+                ))}
             <Link href="/posting/writing">
                 <CustomButton buttonText="게시물 쓰기" />
             </Link>

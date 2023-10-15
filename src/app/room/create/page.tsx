@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getRoomListPromise, isRoomExistPromise } from "@/app/apis/socket/once";
 import { socketInstance } from "@/app/apis/utils/createSoketInstance";
+import CustomButton from "@/app/components/Custombutton";
 
 const RoomsPage = () => {
     const router = useRouter();
@@ -37,11 +38,11 @@ const handleCreateRoom = async () => {
     if (socket && roomName) {
         
         const doesRoomExist = await isRoomExistPromise(roomName);
-        console.log(doesRoomExist)
+        console.log(doesRoomExist);
         setIsRoomExists(doesRoomExist);
 
         if (doesRoomExist) {
-            alert("방 이미 있음 ㅇㅇ"); // You can use a better way to show the message to the user.
+            alert("방 이미 있음 ㅇㅇ");
         } else {
             socket.emit("createRoom", { roomName, maxMembers: 5 });
             router.push(`/room/${roomName}`);
@@ -50,16 +51,14 @@ const handleCreateRoom = async () => {
 };
 
     return (
-        <div>
-            <h1>Rooms</h1>
-
+        <div className="list-container">
             <div>
                 <input
                     value={roomName}
                     onChange={(e) => setRoomName(e.target.value)}
                     placeholder="Enter room name"
                 />
-                <button onClick={handleCreateRoom}>Create Room</button>
+                <CustomButton onClick={handleCreateRoom} buttonText="방 만들기"/>
             </div>
 
             <ul>
