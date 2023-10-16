@@ -6,9 +6,20 @@ import Board from '../posting/page';
 import CreateRoom from '../room/create/page';
 import JoinRoom from '../room/entrance/page';
 import RoomList from '../room/list/page';
+import Modal from '../components/Modal';
+import LoginForm from '../components/LoginForm';
 
 const TapLayout = () => {
     const [selectedTab, setSelectedTab] = useState('게시판');
+    const [showModal, setShowModal] = useState(false);
+  
+    const handleOpenModal = () => {
+      setShowModal(true);
+    };
+  
+    const handleCloseModal = () => {
+      setShowModal(false);
+    };
 
     const getSelectedPageComponent = () => {
         switch (selectedTab) {
@@ -25,7 +36,7 @@ const TapLayout = () => {
         }
     };
 
-    const handleTabClick = (tabName : string) => {
+    const handleTabClick = (tabName: string) => {
         setSelectedTab(tabName);
     };
 
@@ -33,15 +44,18 @@ const TapLayout = () => {
         <div>
             <div className="top-nav">
                 <div>
-                    <a>woozco</a>
+                    <a>WOOZCO</a>
                 </div>
                 <div className="login-menu">
                     <Link href="/register">
                         <Custombutton buttonText='회원가입' />
                     </Link>
-                    <Link href="/login">
-                        <Custombutton buttonText='로그인' />
-                    </Link>
+                    <Custombutton buttonText='로그인' onClick={handleOpenModal} />
+                    {showModal && (
+                        <Modal onClose={handleCloseModal}>
+                            <LoginForm />
+                        </Modal>
+                    )}
                 </div>
             </div>
             <div className="tab-menu">
