@@ -30,7 +30,7 @@ const ListCaller = () => {
             <br></br>
             <div className="list-container">
                 {rooms.map((name) => (
-                    <div className="list-item">
+                    <div key={name}className="list-item">
                         <a>{name}</a>
                         <CustomButton onClick={() => joinRoom(name)} buttonText={"입장"}></CustomButton>
                     </div>

@@ -16,7 +16,7 @@ const RoomsPage = () => {
 
     useEffect(() => {
         setSocket(socketInstance);
-    
+
         const fetchRoomList = async () => {
             try {
                 const fetchedRoomNames = await getRoomListPromise();
@@ -30,25 +30,25 @@ const RoomsPage = () => {
 
         socketInstance.emit("getRooms");
         return () => {
-            
+
         };
     }, []);
 
-const handleCreateRoom = async () => {
-    if (socket && roomName) {
-        
-        const doesRoomExist = await isRoomExistPromise(roomName);
-        console.log(doesRoomExist);
-        setIsRoomExists(doesRoomExist);
+    const handleCreateRoom = async () => {
+        if (socket && roomName) {
 
-        if (doesRoomExist) {
-            alert("방 이미 있음 ㅇㅇ");
-        } else {
-            socket.emit("createRoom", { roomName, maxMembers: 5 });
-            router.push(`/room/${roomName}`);
+            const doesRoomExist = await isRoomExistPromise(roomName);
+            console.log(doesRoomExist);
+            setIsRoomExists(doesRoomExist);
+
+            if (doesRoomExist) {
+                alert("방 이미 있음 ㅇㅇ");
+            } else {
+                socket.emit("createRoom", { roomName, maxMembers: 5 });
+                router.push(`/room/${roomName}`);
+            }
         }
-    }
-};
+    };
 
     return (
         <div className="list-container">
@@ -58,17 +58,14 @@ const handleCreateRoom = async () => {
                     onChange={(e) => setRoomName(e.target.value)}
                     placeholder="Enter room name"
                 />
-                <CustomButton onClick={handleCreateRoom} buttonText="방 만들기"/>
+                <CustomButton onClick={handleCreateRoom} buttonText="방 만들기" />
             </div>
 
             <ul>
                 {rooms.map((room) => (
-                    <div>
-                        <Link key={room} href={`/room/${room}`}>
-                            {room}
-                        </Link>
-                        <br></br>
-                    </div>
+                    <Link key={room} href={`/room/${room}`}>
+                        {room}
+                    </Link>
                 ))}
             </ul>
         </div>

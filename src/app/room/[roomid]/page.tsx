@@ -72,7 +72,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
             <br></br>
             <div className="chat-messages">
                 {messages.map((message, index) => (
-                    <div className="message">
+                    <div key={index} className="message">
                         {message.senderId}: {message.content}
                     </div>
                 ))}
