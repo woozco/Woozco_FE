@@ -3,7 +3,7 @@
 import axios from 'axios';
 import tokenService from './TokenService';
 
-const baseURL = process.env.API_BASE_ADDRESS || 'http://localhost:8080';
+const baseURL = process.env.NEXT_PUBLIC_API_BASE_ADDRESS || 'http://localhost:8080';
 
 function setAuthToken(config) {
   const token = tokenService.getToken();
