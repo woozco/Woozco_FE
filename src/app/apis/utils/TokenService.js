@@ -1,5 +1,3 @@
-// TokenService.js
-
 class TokenService {
     constructor() {
       this.token = null;
@@ -14,7 +12,6 @@ class TokenService {
     }
   }
   
-  // 싱글톤 패턴 적용
   const tokenService = new TokenService();
   export default tokenService;
   

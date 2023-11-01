@@ -1,6 +1,5 @@
 "use client"
 import React, { useState } from "react";
-import Link from "next/link";
 import Custombutton from "./Custombutton";
 import InputOneLine from "./InputOneLine";
 import { PostBoardData } from "../apis/api/board/types";

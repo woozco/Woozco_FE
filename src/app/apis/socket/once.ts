@@ -1,9 +1,9 @@
-import { socketInstance } from "../utils/createSoketInstance";
+import { socket } from "../utils/socket.context";
 import { MessageType } from "./types";
 
 export function getRoomListPromise(): Promise<string[]> {
     return new Promise((resolve) => {
-        socketInstance.once("roomsList", (fetchedRooms: any) => {
+        socket.once("roomsList", (fetchedRooms: any) => {
             const roomNames = Object.keys(fetchedRooms);
             resolve(roomNames);
         });
@@ -12,7 +12,7 @@ export function getRoomListPromise(): Promise<string[]> {
 
 export function receiveRoomMessagePromise(): Promise<MessageType[]>{
     return new Promise((resolve) => {
-        socketInstance.once("roomMessages", (msgs: MessageType[]) => {
+        socket.once("roomMessages", (msgs: MessageType[]) => {
             if (Array.isArray(msgs)) {
                 resolve(msgs);
             } else {
@@ -25,7 +25,7 @@ export function receiveRoomMessagePromise(): Promise<MessageType[]>{
 
 export function receiveNewMessagePromise(): Promise<MessageType> {
     return new Promise((resolve, reject) => {
-        socketInstance.once("newMessage", (msg: MessageType) => {
+        socket.once("newMessage", (msg: MessageType) => {
             if (msg && msg.senderId && msg.content) {
                 resolve(msg);
             } else {
@@ -36,9 +36,9 @@ export function receiveNewMessagePromise(): Promise<MessageType> {
 }
 export function isRoomExistPromise(roomName: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
-        socketInstance.emit("checkRoomExistence", roomName);
+        socket.emit("checkRoomExistence", roomName);
         
-        socketInstance.once("roomExistenceResult", (exists: boolean) => {
+        socket.once("roomExistenceResult", (exists: boolean) => {
             if (typeof exists === "boolean") {
                 resolve(exists);
             } else {

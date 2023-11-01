@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { socketInstance } from "@/app/apis/utils/createSoketInstance";
+import { socket } from "@/app/apis/utils/socket.context";
 import { useRouter } from "next/navigation";
 import CustomButton from "../Custombutton";
 
@@ -9,20 +9,16 @@ const ListCaller = () => {
     const router = useRouter()
 
     const joinRoom = (room: string): void => {
-        socketInstance.emit("joinRoom", room);
-        socketInstance.emit("getClientsInRoom", room);
+        socket.emit("joinRoom", room);
+        socket.emit("getClientsInRoom", room);
         router.push(`/room/${room}`)
     };
 
     useEffect(() => {
-        socketInstance.emit("getRooms");
-        socketInstance.on("roomsList", (data) => {
+        socket.emit("getRooms");
+        socket.on("roomsList", (data) => {
             setRooms(data);
         });
-
-        return () => {
-
-        };
     }, []);
 
     return (

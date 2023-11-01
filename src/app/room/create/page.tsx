@@ -1,22 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Socket } from "socket.io-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getRoomListPromise, isRoomExistPromise } from "@/app/apis/socket/once";
-import { socketInstance } from "@/app/apis/utils/createSoketInstance";
+import { socket } from "@/app/apis/utils/socket.context";
 import CustomButton from "@/app/components/Custombutton";
 
 const RoomsPage = () => {
     const router = useRouter();
-    const [socket, setSocket] = useState<Socket | null>(null);
     const [rooms, setRooms] = useState<string[]>([]);
     const [roomName, setRoomName] = useState<string>("");
     const [isRoomExists, setIsRoomExists] = useState<boolean | null>(null);
 
     useEffect(() => {
-        setSocket(socketInstance);
-
         const fetchRoomList = async () => {
             try {
                 const fetchedRoomNames = await getRoomListPromise();
@@ -28,10 +24,7 @@ const RoomsPage = () => {
 
         fetchRoomList();
 
-        socketInstance.emit("getRooms");
-        return () => {
-
-        };
+        socket.emit("getRooms");
     }, []);
 
     const handleCreateRoom = async () => {

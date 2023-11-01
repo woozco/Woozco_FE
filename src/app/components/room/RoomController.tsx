@@ -1,42 +1,32 @@
 "use client";
 import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
 import { useRouter } from 'next/navigation'
-import { socketInstance } from "@/app/apis/utils/createSoketInstance";
+import { socket } from "@/app/apis/utils/socket.context";
 import CustomButton from "../Custombutton";
 
 const RoomController: React.FC = () => {
     const router = useRouter()
-    const [socket, setSocket] = useState<Socket | null>(null);
     const [room, setRoom] = useState<string>("");
 
-    useEffect(() => {
-        setSocket(socketInstance);
-
-        return () => {
-            socketInstance.close();
-        };
-    }, []);
-
     const joinRoom = () : void =>  {
-        socketInstance.emit("joinRoom", room);
-        socketInstance.emit("getClientsInRoom", room);
+        socket.emit("joinRoom", room);
+        socket.emit("getClientsInRoom", room);
         router.push(`/room/${room}`)
     };
 
     useEffect(() => {
-        socketInstance.on("joinedRoom", (room: string) => {
+        socket.on("joinedRoom", (room: string) => {
             console.log(`Joined room ${room}`);
         });
-        socketInstance.on("leftRoom", (room: string) => {
+        socket.on("leftRoom", (room: string) => {
             console.log(`Left room ${room}`);
         });
 
         return () => {
-            socketInstance.off("joinedRoom");
-            socketInstance.off("leftRoom");
+            socket.off("joinedRoom");
+            socket.off("leftRoom");
         };
-    }, [socketInstance]);
+    }, [socket]);
 
     return (
         <div className="list-container">
