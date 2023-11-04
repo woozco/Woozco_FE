@@ -29,11 +29,7 @@ const RoomsPage = () => {
 
     const handleCreateRoom = async () => {
         if (socket && roomName) {
-
             const doesRoomExist = await isRoomExistPromise(roomName);
-            console.log(doesRoomExist);
-            setIsRoomExists(doesRoomExist);
-
             if (doesRoomExist) {
                 alert("방 이미 있음 ㅇㅇ");
             } else {
@@ -53,14 +49,6 @@ const RoomsPage = () => {
                 />
                 <CustomButton onClick={handleCreateRoom} buttonText="방 만들기" />
             </div>
-
-            <ul>
-                {rooms.map((room) => (
-                    <Link key={room} href={`/room/${room}`}>
-                        {room}
-                    </Link>
-                ))}
-            </ul>
         </div>
     );
 };

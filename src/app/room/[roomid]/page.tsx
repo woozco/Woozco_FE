@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useRef, useEffect, useState } from "react";
-import { receiveRoomMessagePromise } from "@/app/apis/socket/once"; // 경로는 함수가 정의된 파일의 경로입니다.
+import { useEffect, useState } from "react";
+import { receiveRoomMessagePromise } from "@/app/apis/socket/once";
 import { socket, mediasoup } from "../../apis/utils/socket.context";
 import * as mediasoupClient from "mediasoup-client";
 import CustomButton from "@/app/components/Custombutton";
@@ -17,7 +17,6 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     const [messages, setMessages] = useState<MessageType[]>([]);
     const [messageContent, setMessageContent] = useState<string>("");
     const [clients, setClients] = useState<string[]>([]);
-    const videoContainerRef = useRef(null);
 
     const leaveRoom = () => {
         socket.emit("leaveRoom", params.roomid);
@@ -177,6 +176,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     }
 
     const getScreenShareStream = () => {
+
         const shareVideoElement = document.getElementById('shareVideo'); // 화면 공유 비디오 엘리먼트
         navigator.mediaDevices.getDisplayMedia({
             video: true
@@ -205,8 +205,8 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
 
     const getProducers = () => {
         mediasoup.emit('getProducers', (producerIds: any) => {
-            console.log(producerIds)
-            producerIds.forEach(signalNewConsumerTransport)
+            console.log("pIds : " + producerIds);
+            producerIds.forEach(signalNewConsumerTransport);
         })
     }
 
@@ -272,7 +272,8 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                 },
             ]
 
-            const { track } = consumer
+            const { track } = consumer;
+            console.log(track);
 
             const vidElement = document.getElementById('videoContainer');
 
@@ -345,14 +346,6 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
             <div className="chat-title">
                 <a>{Pathname}</a>
             </div>
-            <br></br>
-            <div className="chat-messages">
-                {messages.map((message, index) => (
-                    <div key={index} className="message">
-                        {message.senderId}: {message.content}
-                    </div>
-                ))}
-            </div>
             <div>
                 <div id="video">
                     <table className="mainTable">
@@ -365,7 +358,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                                     <video id="shareVideo" autoPlay className="video" muted ></video>
                                 </td>
                                 <td className="remoteColumn">
-                                    <div id="videoContainer"></div>
+                                    <video id="videoContainer"></video>
                                 </td>
                             </tr>
                         </tbody>
@@ -374,6 +367,13 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                 <CustomButton onClick={handleStartShare} buttonText="화면 공유 시작" />
                 <CustomButton onClick={handleStartFace} buttonText="얼굴 공유 시작" />
                 <CustomButton onClick={handleSireo} buttonText="싫어" />
+            </div>
+            <div className="chat-messages">
+                {messages.map((message, index) => (
+                    <div key={index} className="message">
+                        {message.senderId}: {message.content}
+                    </div>
+                ))}
             </div>
             <div className="chat-input">
                 <input

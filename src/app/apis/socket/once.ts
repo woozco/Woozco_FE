@@ -4,8 +4,8 @@ import { MessageType } from "./types";
 export function getRoomListPromise(): Promise<string[]> {
     return new Promise((resolve) => {
         socket.once("roomsList", (fetchedRooms: any) => {
-            const roomNames = Object.keys(fetchedRooms);
-            resolve(roomNames);
+            // const roomNames = Object.keys(fetchedRooms);
+            resolve(fetchedRooms);
         });
     });
 }

@@ -4,7 +4,7 @@ import { PostRegisterData, PostLoginData, PostChangePWData } from "./types"
 
 export async function postRegisterRequest(postRegisterData: PostRegisterData): Promise<void> {
   try {
-    const response: AxiosResponse = await apiInstance.post('/auth/register', postRegisterData);
+    const response: AxiosResponse = await apiInstance.post('/api/auth/register', postRegisterData);
     console.log('POST 요청 성공:', response.data);
   } catch (error) {
     console.error('POST 요청 오류:', error);
@@ -13,7 +13,7 @@ export async function postRegisterRequest(postRegisterData: PostRegisterData): P
 
 export async function postdLoginRequest(postLoginData: PostLoginData): Promise<void> {
   try {
-    const response: AxiosResponse = await apiInstance.post('/auth/login', postLoginData);
+    const response: AxiosResponse = await apiInstance.post('/api/auth/login', postLoginData);
     console.log('POST 요청 성공:', response.data);
     localStorage.setItem('token', response.data.access_token);
   } catch (error) {
@@ -23,7 +23,7 @@ export async function postdLoginRequest(postLoginData: PostLoginData): Promise<v
 
 export async function postChangePasswordRequest(postChangePWData: PostChangePWData): Promise<void> {
   try {
-    const response: AxiosResponse = await apiInstance.post('/auth/changepw', postChangePWData);
+    const response: AxiosResponse = await apiInstance.post('/api/auth/changepw', postChangePWData);
     console.log('POST 요청 성공:', response.data);
   } catch (error) {
     console.error('POST 요청 오류:', error);
@@ -32,7 +32,7 @@ export async function postChangePasswordRequest(postChangePWData: PostChangePWDa
 
 export async function getProfile(): Promise<AxiosResponse | undefined> {
   try {
-    const response: AxiosResponse = await apiInstance.get('/auth/profile');
+    const response: AxiosResponse = await apiInstance.get('/api/auth/profile');
     return response;
   } catch (error) {
     console.error('GET Profile', error);
