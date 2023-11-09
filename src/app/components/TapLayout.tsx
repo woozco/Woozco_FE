@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Custombutton from './Custombutton';
 import Board from '../posting/page';
-import CreateRoom from '../room/create/page';
-import JoinRoom from '../room/entrance/page';
 import RoomList from '../room/list/page';
 import Modal from '../components/Modal';
 import LoginForm from '../components/LoginForm';
@@ -25,14 +23,10 @@ const TapLayout = () => {
         switch (selectedTab) {
             case '게시판':
                 return <Board />;
-            case '방 만들기':
-                return <CreateRoom />;
-            case '방 입장':
-                return <JoinRoom />;
-            case '방 목록':
+            case '스터디방':
                 return <RoomList />;
             default:
-                return null;
+                return <Board />;
         }
     };
 
@@ -60,9 +54,7 @@ const TapLayout = () => {
             </div>
             <div className="tab-menu">
                 <Custombutton buttonText='게시판' onClick={() => handleTabClick('게시판')} />
-                <Custombutton buttonText='방 만들기' onClick={() => handleTabClick('방 만들기')} />
-                <Custombutton buttonText='방 입장' onClick={() => handleTabClick('방 입장')} />
-                <Custombutton buttonText='방 목록' onClick={() => handleTabClick('방 목록')} />
+                <Custombutton buttonText='스터디방' onClick={() => handleTabClick('스터디방')} />
             </div>
             <div>
                 {getSelectedPageComponent()}

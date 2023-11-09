@@ -1,15 +1,20 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { receiveRoomMessagePromise } from "@/app/apis/socket/once";
-import { socket, mediasoup } from "../../apis/utils/socket.context";
 import * as mediasoupClient from "mediasoup-client";
 import CustomButton from "@/app/components/Custombutton";
+import { socket, mediasoup } from '../../apis/utils/socket.context';
 
 type MessageType = {
     senderId: string;
     content: string;
 };
+
+interface RemoteVideoProps {
+    remoteProducerId: string;
+    track: MediaStreamTrack;
+}
 
 const RoomPage = ({ params }: { params: { roomid: string } }) => {
     const Pathname = params.roomid;
@@ -17,6 +22,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     const [messages, setMessages] = useState<MessageType[]>([]);
     const [messageContent, setMessageContent] = useState<string>("");
     const [clients, setClients] = useState<string[]>([]);
+    const videoRef = useRef<HTMLVideoElement>(null);
 
     const leaveRoom = () => {
         socket.emit("leaveRoom", params.roomid);
@@ -24,7 +30,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     };
 
     mediasoup.on('connection-success', ({ socketId }) => {
-        console.log(socketId)
+        console.log("connect : " + socketId)
     });
 
     let device: any;
@@ -54,11 +60,12 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
         ],
         codecOptions: {
             videoGoogleStartBitrate: 1000
-        }
+        },
+        track: null
     }
 
     const joinRoom = () => {
-        mediasoup.emit('joinRoom', { Pathname }, (data: any) => {
+        mediasoup.emit('joinRoom', Pathname, (data: any) => {
             console.log(`Router RTP Capabilities... ${data.rtpCapabilities}`)
             rtpCapabilities = data.rtpCapabilities
             createDevice()
@@ -84,17 +91,18 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     }
 
     const createSendTransport = () => {
-        mediasoup.emit('createWebRtcTransport', { consumer: false }, (mediasoupParams: any) => {
-            if (mediasoupParams.error) {
-                console.log(mediasoupParams.error)
+        mediasoup.emit('createWebRtcTransport', { consumer: false }, (socketParmas: any) => {
+            if (socketParmas.error) {
+                console.log(socketParmas.error)
                 return
             }
 
-            console.log(params)
+            console.log(socketParmas);
 
-            producerTransport = device.createSendTransport(params)
+            producerTransport = device.createSendTransport(socketParmas);
 
             producerTransport.on('connect', async ({ dtlsParameters }: any, callback: any, errback: any) => {
+                console.log(dtlsParameters);
                 try {
                     await mediasoup.emit('transport-connect', {
                         dtlsParameters,
@@ -117,7 +125,6 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                         appData: parameters.appData,
                     }, ({ id, producersExist }: any) => {
                         callback({ id })
-
                         if (producersExist) getProducers()
                     })
                 } catch (error) {
@@ -130,7 +137,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     }
 
     const connectSendTransport = async () => {
-        producer = await producerTransport.produce(params)
+        producer = await producerTransport.produce(mediasoupParams);
 
         producer.on('trackended', () => {
             console.log('track ended')
@@ -144,12 +151,8 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     const streamSuccess = (stream: any, videoElement: any) => {
         videoElement.srcObject = stream;  // 화면 공유 비디오 엘리먼트 또는 로컬 비디오 엘리먼트로 스트림 설정
         const track = stream.getVideoTracks()[0];
-        const params = {
-            track,
-            ...mediasoupParams
-        };
-        mediasoupParams = params;
-
+        mediasoupParams.track = track;
+        console.log(mediasoupParams);
         joinRoom();
     }
 
@@ -176,7 +179,6 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     }
 
     const getScreenShareStream = () => {
-
         const shareVideoElement = document.getElementById('shareVideo'); // 화면 공유 비디오 엘리먼트
         navigator.mediaDevices.getDisplayMedia({
             video: true
@@ -204,6 +206,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     mediasoup.on('new-producer', ({ producerId }) => signalNewConsumerTransport(producerId))
 
     const getProducers = () => {
+
         mediasoup.emit('getProducers', (producerIds: any) => {
             console.log("pIds : " + producerIds);
             producerIds.forEach(signalNewConsumerTransport);
@@ -211,12 +214,13 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     }
 
     const signalNewConsumerTransport = async (remoteProducerId: any) => {
+        console.log("signal");
         await socket.emit('createWebRtcTransport', { consumer: true }, (mediasoupParams: any) => {
             if (mediasoupParams.error) {
                 console.log(mediasoupParams.error)
                 return
             }
-            console.log(`PARAMS... ${params}`)
+            console.log(`PARAMS... ${mediasoupParams}`)
 
             let consumerTransport
             try {
@@ -232,18 +236,18 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                         dtlsParameters,
                         serverConsumerTransportId: mediasoupParams.id,
                     })
-
                     callback()
                 } catch (error) {
                     errback(error)
                 }
-            })
+            });
 
             connectRecvTransport(consumerTransport, remoteProducerId, mediasoupParams.id)
         })
     }
 
     const connectRecvTransport = async (consumerTransport: any, remoteProducerId: any, serverConsumerTransportId: any) => {
+        console.log("connectRecvTransport");
         await mediasoup.emit('consume', {
             rtpCapabilities: device.rtpCapabilities,
             remoteProducerId,
@@ -273,17 +277,13 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
             ]
 
             const { track } = consumer;
-            console.log(track);
 
-            const vidElement = document.getElementById('videoContainer');
-
-            const newElem = document.createElement('div')
-            newElem.setAttribute('id', `td-${remoteProducerId}`)
-            newElem.setAttribute('class', 'remoteVideo')
-            newElem.innerHTML = '<video id="' + remoteProducerId + '" autoplay class="video" ></video>'
-            vidElement?.appendChild(newElem)
-
-            document.getElementById(remoteProducerId).srcObject = new MediaStream([track])
+            console.log("videoRef");
+            const videoElement = videoRef.current;
+            if (videoElement) {
+                console.log("videoEle : " + videoElement);
+                videoElement.srcObject = new MediaStream([track]);
+            }
 
             mediasoup.emit('consumer-resume', { serverConsumerId: mediasoupParams.serverConsumerId })
         })
@@ -342,52 +342,40 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     };
 
     return (
-        <div className="chat-room">
-            <div className="chat-title">
-                <a>{Pathname}</a>
-            </div>
-            <div>
-                <div id="video">
-                    <table className="mainTable">
-                        <tbody>
-                            <tr>
-                                <td className="localColumn">
-                                    <video id="localVideo" autoPlay className="video" muted ></video>
-                                </td>
-                                <td className="localColumn">
-                                    <video id="shareVideo" autoPlay className="video" muted ></video>
-                                </td>
-                                <td className="remoteColumn">
-                                    <video id="videoContainer"></video>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div className="chat-room">
+                <div className="chat-title">
+                    <a>{Pathname}</a>
                 </div>
-                <CustomButton onClick={handleStartShare} buttonText="화면 공유 시작" />
-                <CustomButton onClick={handleStartFace} buttonText="얼굴 공유 시작" />
-                <CustomButton onClick={handleSireo} buttonText="싫어" />
-            </div>
-            <div className="chat-messages">
-                {messages.map((message, index) => (
-                    <div key={index} className="message">
-                        {message.senderId}: {message.content}
+                <div>
+                    <div id="video">
+                        <video id="localVideo" autoPlay className="video" muted />
+                        <video id="shareVideo" autoPlay className="video" muted />
+                        <video ref={videoRef} autoPlay className="video" />
                     </div>
-                ))}
+                    <CustomButton onClick={handleStartShare} buttonText="화면 공유 시작" />
+                    <CustomButton onClick={handleStartFace} buttonText="얼굴 공유 시작" />
+                    <CustomButton onClick={handleSireo} buttonText="싫어" />
+                </div>
+                <div className="chat-messages">
+                    {messages.map((message, index) => (
+                        <div key={index} className="message">
+                            {message.senderId}: {message.content}
+                        </div>
+                    ))}
+                </div>
+                <div className="chat-input">
+                    <input
+                        className="message-input"
+                        type="text"
+                        value={messageContent}
+                        onChange={(e) => setMessageContent(e.target.value)}
+                        placeholder="메시지 입력"
+                    />
+                    <CustomButton onClick={handleSendMessage} buttonText="전송" />
+                </div>
+                <br></br>
+                <CustomButton onClick={leaveRoom} buttonText="나가기" />
             </div>
-            <div className="chat-input">
-                <input
-                    className="message-input"
-                    type="text"
-                    value={messageContent}
-                    onChange={(e) => setMessageContent(e.target.value)}
-                    placeholder="메시지 입력"
-                />
-                <CustomButton onClick={handleSendMessage} buttonText="전송" />
-            </div>
-            <br></br>
-            <CustomButton onClick={leaveRoom} buttonText="나가기" />
-        </div >
     );
 };
 

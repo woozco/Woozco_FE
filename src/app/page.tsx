@@ -3,9 +3,7 @@ import TapLayout from './components/TapLayout';
 
 const App: React.FC = () => {
   return (
-      <div>
-        <TapLayout />
-      </div>
+    <TapLayout />
   )
 }
 

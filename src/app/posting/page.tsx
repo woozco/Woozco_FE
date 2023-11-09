@@ -10,14 +10,12 @@ const BoardsPage: React.FC = () => {
     const [boardData, setBoardData] = useState<PostBoardData[]>([]);
 
     useEffect(() => {
-        // 페이지가 로드될 때 getAllBoard 함수를 호출하여 게시판 데이터를 가져옴
         fetchData();
     }, []);
 
     const fetchData = async () => {
         try {
             const response: AxiosResponse = await getAllBoard();
-            // API에서 받은 데이터를 상태에 저장
             setBoardData(response.data);
         } catch (error) {
             console.error("데이터 가져오기 오류:", error);
