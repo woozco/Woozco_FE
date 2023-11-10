@@ -9,9 +9,6 @@ const RoomController: React.FC = () => {
     const router = useRouter()
     const [roomName, setRoomName] = useState<string>("");
 
-    const joinRoom = (): void => {
-    };
-
     useEffect(() => {
         socket.on("joinedRoom", (room) => {
             console.log(`Joined room ` + room);

@@ -26,6 +26,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
 
     const leaveRoom = () => {
         socket.emit("leaveRoom", params.roomid);
+        mediasoup.emit("disconnect");
         router.push("/");
     };
 
@@ -79,7 +80,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                 routerRtpCapabilities: rtpCapabilities
             })
 
-            console.log('Device RTP Capabilities', device.rtpCapabilities)
+            console.log('Create Device', device);
 
             createSendTransport()
 
@@ -96,8 +97,6 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                 console.log(socketParmas.error)
                 return
             }
-
-            console.log(socketParmas);
 
             producerTransport = device.createSendTransport(socketParmas);
 
@@ -157,8 +156,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     }
 
     const getLocalStream = () => {
-        const localVideo = document.getElementById('localVideo'); // 로컬 비디오 엘리먼트 추가
-
+        const localVideo = document.getElementById('localVideo');
         navigator.mediaDevices.getUserMedia({
             audio: true,
             video: {
@@ -206,7 +204,6 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     mediasoup.on('new-producer', ({ producerId }) => signalNewConsumerTransport(producerId))
 
     const getProducers = () => {
-
         mediasoup.emit('getProducers', (producerIds: any) => {
             console.log("pIds : " + producerIds);
             producerIds.forEach(signalNewConsumerTransport);
@@ -214,25 +211,24 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     }
 
     const signalNewConsumerTransport = async (remoteProducerId: any) => {
-        console.log("signal");
-        await socket.emit('createWebRtcTransport', { consumer: true }, (mediasoupParams: any) => {
+        await mediasoup.emit('createWebRtcTransport', { consumer : true }, (mediasoupParams: any) => {
             if (mediasoupParams.error) {
                 console.log(mediasoupParams.error)
                 return
             }
-            console.log(`PARAMS... ${mediasoupParams}`)
 
+            console.log(JSON.stringify(device));
             let consumerTransport
             try {
-                consumerTransport = device.createRecvTransport(params)
+                consumerTransport = device.createRecvTransport(mediasoupParams)
             } catch (error) {
                 console.log(error)
                 return
             }
-
+            console.log("consumerTransport : " + consumerTransport);
             consumerTransport.on('connect', async ({ dtlsParameters }: any, callback: any, errback: any) => {
                 try {
-                    await socket.emit('transport-recv-connect', {
+                    await mediasoup.emit('transport-recv-connect', {
                         dtlsParameters,
                         serverConsumerTransportId: mediasoupParams.id,
                     })
@@ -242,29 +238,29 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                 }
             });
 
-            connectRecvTransport(consumerTransport, remoteProducerId, mediasoupParams.id)
+            connectRecvTransport(consumerTransport, remoteProducerId, mediasoupParams.id);
         })
     }
 
     const connectRecvTransport = async (consumerTransport: any, remoteProducerId: any, serverConsumerTransportId: any) => {
-        console.log("connectRecvTransport");
         await mediasoup.emit('consume', {
             rtpCapabilities: device.rtpCapabilities,
             remoteProducerId,
             serverConsumerTransportId,
         }, async (mediasoupParams: any) => {
             if (mediasoupParams.error) {
-                console.log('Cannot Consume')
-                return
+                console.log('Cannot Consume');
+                return;
             }
 
-            console.log(`Consumer Params ${mediasoupParams}`)
+            console.log(`Consumer Params > ` + JSON.stringify(mediasoupParams));
             const consumer = await consumerTransport.consume({
                 id: mediasoupParams.id,
                 producerId: mediasoupParams.producerId,
                 kind: mediasoupParams.kind,
                 rtpParameters: mediasoupParams.rtpParameters
-            })
+            });
+            console.log("consumer > " + consumer);
 
             consumerTransports = [
                 ...consumerTransports,
@@ -278,7 +274,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
 
             const { track } = consumer;
 
-            console.log("videoRef");
+            console.log("videoRef", track);
             const videoElement = videoRef.current;
             if (videoElement) {
                 console.log("videoEle : " + videoElement);
