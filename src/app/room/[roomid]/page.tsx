@@ -67,18 +67,18 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
 
     const joinRoom = () => {
         mediasoup.emit('joinRoom', Pathname, (data: any) => {
-            console.log(`Router RTP Capabilities... ${data.rtpCapabilities}`)
-            rtpCapabilities = data.rtpCapabilities
-            createDevice()
+            console.log(`Router RTP Capabilities... ${data.rtpCapabilities}`);
+            rtpCapabilities = data.rtpCapabilities;
+            createDevice();
         })
     }
 
     const createDevice = async () => {
         try {
-            device = new mediasoupClient.Device()
+            device = new mediasoupClient.Device();
             await device.load({
                 routerRtpCapabilities: rtpCapabilities
-            })
+            });
 
             console.log('Create Device', device);
 
@@ -99,8 +99,8 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
             }
 
             producerTransport = device.createSendTransport(socketParmas);
-
-            producerTransport.on('connect', async ({ dtlsParameters }: any, callback: any, errback: any) => {
+            console.log(producerTransport);
+            producerTransport.on('connect', async ( {dtlsParameters}: any, callback: any, errback: any) => {
                 console.log(dtlsParameters);
                 try {
                     await mediasoup.emit('transport-connect', {
@@ -123,6 +123,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                         rtpParameters: parameters.rtpParameters,
                         appData: parameters.appData,
                     }, ({ id, producersExist }: any) => {
+                        console.log(id, producersExist);
                         callback({ id })
                         if (producersExist) getProducers()
                     })
@@ -292,8 +293,10 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
 
         consumerTransports = consumerTransports.filter((transportData: any) => transportData.producerId !== remoteProducerId);
 
-        const vidElement = document.getElementById('videoContainer');
-        vidElement?.removeChild(document.getElementById(`td-${remoteProducerId}`))
+        const videoElement = videoRef.current;
+        if (videoElement) {
+            videoElement.srcObject = null;
+        }
     })
 
     useEffect(() => {
