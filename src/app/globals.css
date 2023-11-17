@@ -143,10 +143,10 @@ body {
 }
 
 video {
-  width: 360px;
-background-color: black;
-padding: 10;
-margin: 1px 1px;
+  width: 700px;
+  background-color: black;
+  padding: 10;
+  margin: 1px 1px;
 }
 .mainTable {
   width: 100%;

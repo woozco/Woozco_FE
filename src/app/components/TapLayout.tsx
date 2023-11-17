@@ -38,7 +38,7 @@ const TapLayout = () => {
         <div>
             <div className="top-nav">
                 <div>
-                    <a>WOOZCO</a>
+                    <a>Woozco</a>
                 </div>
                 <div className="login-menu">
                     <Link href="/register">

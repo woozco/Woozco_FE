@@ -11,11 +11,6 @@ type MessageType = {
     content: string;
 };
 
-interface RemoteVideoProps {
-    remoteProducerId: string;
-    track: MediaStreamTrack;
-}
-
 const RoomPage = ({ params }: { params: { roomid: string } }) => {
     const Pathname = params.roomid;
     const router = useRouter();
@@ -38,8 +33,8 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
     let rtpCapabilities: any;
     let producerTransport: any;
     let consumerTransports: any = []
-    let producer: any
-    let consumer: any
+    let producer: any;
+    let consumer = {id: null};
     let isProducer: any = false
     let mediasoupParams = {
         encodings: [
@@ -124,6 +119,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                         appData: parameters.appData,
                     }, ({ id, producersExist }: any) => {
                         console.log(id, producersExist);
+                        consumer.id = id;
                         callback({ id })
                         if (producersExist) getProducers()
                     })
@@ -152,7 +148,6 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
         videoElement.srcObject = stream;  // 화면 공유 비디오 엘리먼트 또는 로컬 비디오 엘리먼트로 스트림 설정
         const track = stream.getVideoTracks()[0];
         mediasoupParams.track = track;
-        console.log(mediasoupParams);
         joinRoom();
     }
 
@@ -206,6 +201,9 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
 
     const getProducers = () => {
         mediasoup.emit('getProducers', (producerIds: any) => {
+            // if(!producerIds.includes(consumer.id)) {
+            //     producerIds.push(consumer.id);
+            // }
             console.log("pIds : " + producerIds);
             producerIds.forEach(signalNewConsumerTransport);
         })
@@ -218,7 +216,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                 return
             }
 
-            console.log(JSON.stringify(device));
+            console.log(device, remoteProducerId);
             let consumerTransport
             try {
                 consumerTransport = device.createRecvTransport(mediasoupParams)
@@ -254,14 +252,13 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                 return;
             }
 
-            console.log(`Consumer Params > ` + JSON.stringify(mediasoupParams));
+            console.log(`Consumer Params > ` + mediasoupParams);
             const consumer = await consumerTransport.consume({
                 id: mediasoupParams.id,
                 producerId: mediasoupParams.producerId,
                 kind: mediasoupParams.kind,
                 rtpParameters: mediasoupParams.rtpParameters
             });
-            console.log("consumer > " + consumer);
 
             consumerTransports = [
                 ...consumerTransports,
@@ -275,27 +272,28 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
 
             const { track } = consumer;
 
-            console.log("videoRef", track);
-            const videoElement = videoRef.current;
-            if (videoElement) {
-                console.log("videoEle : " + videoElement);
-                videoElement.srcObject = new MediaStream([track]);
+            console.log("consumer-track", track);
+        
+            if (videoRef.current) {
+                const mediaStream = new MediaStream();
+                mediaStream.addTrack(track);
+
+                videoRef.current.srcObject = mediaStream;
             }
 
             mediasoup.emit('consumer-resume', { serverConsumerId: mediasoupParams.serverConsumerId })
         })
     }
 
-    mediasoup.on('producer-closed', ({ remoteProducerId }) => {
+    mediasoup.on('producer-closed', ( remoteProducerId ) => {
         const producerToClose = consumerTransports.find((transportData: any) => transportData.producerId === remoteProducerId)
         producerToClose.consumerTransport.close()
         producerToClose.consumer.close()
 
         consumerTransports = consumerTransports.filter((transportData: any) => transportData.producerId !== remoteProducerId);
 
-        const videoElement = videoRef.current;
-        if (videoElement) {
-            videoElement.srcObject = null;
+        if (videoRef.current) {
+            videoRef.current.srcObject = null;
         }
     })
 
@@ -349,7 +347,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                     <div id="video">
                         <video id="localVideo" autoPlay className="video" muted />
                         <video id="shareVideo" autoPlay className="video" muted />
-                        <video ref={videoRef} autoPlay className="video" />
+                        <video ref={videoRef} className="video" />
                     </div>
                     <CustomButton onClick={handleStartShare} buttonText="화면 공유 시작" />
                     <CustomButton onClick={handleStartFace} buttonText="얼굴 공유 시작" />
