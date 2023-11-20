@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { receiveRoomMessagePromise } from "@/app/apis/socket/once";
 import * as mediasoupClient from "mediasoup-client";
 import CustomButton from "@/app/components/Custombutton";
-import { socket, mediasoup } from '../../apis/utils/socket.context';
+import { socket } from '../../apis/utils/socket.context';
 
 type MessageType = {
     senderId: string;
@@ -29,7 +29,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
         console.log("connect : " + socketId)
     });
 
-    let device: any;
+    let device: mediasoupClient.Device;
     let rtpCapabilities: any;
     let producerTransport: any;
     let consumerTransports: any = []
@@ -60,96 +60,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
         track: null
     }
 
-    const joinRoom = () => {
-        mediasoup.emit('joinRoom', Pathname, (data: any) => {
-            console.log(`Router RTP Capabilities... ${data.rtpCapabilities}`);
-            rtpCapabilities = data.rtpCapabilities;
-            createDevice();
-        })
-    }
-
-    const createDevice = async () => {
-        try {
-            device = new mediasoupClient.Device();
-            await device.load({
-                routerRtpCapabilities: rtpCapabilities
-            });
-
-            console.log('Create Device', device);
-
-            createSendTransport()
-
-        } catch (error: any) {
-            console.log(error)
-            if (error.name === 'UnsupportedError')
-                console.warn('browser not supported')
-        }
-    }
-
-    const createSendTransport = () => {
-        mediasoup.emit('createWebRtcTransport', { consumer: false }, (socketParmas: any) => {
-            if (socketParmas.error) {
-                console.log(socketParmas.error)
-                return
-            }
-
-            producerTransport = device.createSendTransport(socketParmas);
-            console.log(producerTransport);
-            producerTransport.on('connect', async ( {dtlsParameters}: any, callback: any, errback: any) => {
-                console.log(dtlsParameters);
-                try {
-                    await mediasoup.emit('transport-connect', {
-                        dtlsParameters,
-                    })
-
-                    callback()
-
-                } catch (error) {
-                    errback(error)
-                }
-            })
-
-            producerTransport.on('produce', async (parameters: any, callback: any, errback: any) => {
-                console.log(parameters)
-
-                try {
-                    await mediasoup.emit('transport-produce', {
-                        kind: parameters.kind,
-                        rtpParameters: parameters.rtpParameters,
-                        appData: parameters.appData,
-                    }, ({ id, producersExist }: any) => {
-                        console.log(id, producersExist);
-                        consumer.id = id;
-                        callback({ id })
-                        if (producersExist) getProducers()
-                    })
-                } catch (error) {
-                    errback(error)
-                }
-            })
-
-            connectSendTransport()
-        })
-    }
-
-    const connectSendTransport = async () => {
-        producer = await producerTransport.produce(mediasoupParams);
-
-        producer.on('trackended', () => {
-            console.log('track ended')
-        })
-
-        producer.on('transportclose', () => {
-            console.log('transport ended')
-        })
-    }
-
-    const streamSuccess = (stream: any, videoElement: any) => {
-        videoElement.srcObject = stream;  // 화면 공유 비디오 엘리먼트 또는 로컬 비디오 엘리먼트로 스트림 설정
-        const track = stream.getVideoTracks()[0];
-        mediasoupParams.track = track;
-        joinRoom();
-    }
+    let sibalcount = 0;
 
     const getLocalStream = () => {
         const localVideo = document.getElementById('localVideo');
@@ -183,62 +94,142 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
             });
     }
 
-    const handleStartShare = () => {
-        console.log("startShare clicked")
-        getScreenShareStream();
-    };
-
-    const handleStartFace = () => {
-        console.log("startFace clicked")
-        getLocalStream();
+    const streamSuccess = (stream: any, videoElement: any) => {
+        videoElement.srcObject = stream; 
+        const track = stream.getVideoTracks()[0];
+        mediasoupParams.track = track;
+        joinRoom();
     }
 
-    const handleSireo = () => {
-        console.log("나도 싫어")
+    const joinRoom = () => {
+        mediasoup.emit('joinRoom', Pathname, (data: any) => {
+            console.log(`Router RTP Capabilities... ${data.rtpCapabilities}`);
+            rtpCapabilities = data.rtpCapabilities;
+            createDevice();
+        })
     }
 
-    mediasoup.on('new-producer', ({ producerId }) => signalNewConsumerTransport(producerId))
+    const createDevice = async () => {
+        try {
+            device = new mediasoupClient.Device();
+            await device.load({
+                routerRtpCapabilities: rtpCapabilities
+            });
+
+            console.log('Create Device', device);
+
+            createSendTransport()
+
+        } catch (error: any) {
+            console.log(error)
+            if (error.name === 'UnsupportedError')
+                console.warn('browser not supported')
+        }
+    }
+
+    const createSendTransport = async () => {
+        await mediasoup.emit('createWebRtcTransport', { consumer: false }, (socketParmas: any) => {
+            if (socketParmas.error) {
+                console.log(socketParmas.error);
+                return;
+            }
+            console.log("createSendTransport", device );
+            producerTransport = device.createSendTransport(socketParmas);
+            console.log(producerTransport);
+            producerTransport.on('connect', async ( {dtlsParameters}: any, callback: any, errback: any) => {
+                console.log(dtlsParameters);
+                try {
+                    await mediasoup.emit('transport-connect', {
+                        dtlsParameters,
+                    })
+
+                    callback()
+
+                } catch (error) {
+                    errback(error)
+                }
+            })
+
+            producerTransport.on('produce', async (parameters: any, callback: any, errback: any) => {
+                console.log(parameters)
+
+                try {
+                    await mediasoup.emit('transport-produce', {
+                        kind: parameters.kind,
+                        rtpParameters: parameters.rtpParameters,
+                        appData: parameters.appData,
+                    }, ({ id, producersExist }: any) => {
+                        callback({ id })
+                        if (producersExist) getProducers()
+                    })
+                } catch (error) {
+                    errback(error)
+                }
+            })
+
+            connectSendTransport()
+        })
+    }
+
+    const connectSendTransport = async () => {
+        producer = await producerTransport.produce(mediasoupParams);
+
+        producer.on('trackended', () => {
+            console.log('track ended')
+        })
+
+        producer.on('transportclose', () => {
+            console.log('transport ended')
+        })
+    }
+
+    mediasoup.on('new-producer', ({ producerId }) => {
+        signalNewConsumerTransport(producerId);
+    })
 
     const getProducers = () => {
         mediasoup.emit('getProducers', (producerIds: any) => {
-            // if(!producerIds.includes(consumer.id)) {
-            //     producerIds.push(consumer.id);
-            // }
             console.log("pIds : " + producerIds);
             producerIds.forEach(signalNewConsumerTransport);
         })
     }
 
     const signalNewConsumerTransport = async (remoteProducerId: any) => {
-        await mediasoup.emit('createWebRtcTransport', { consumer : true }, (mediasoupParams: any) => {
-            if (mediasoupParams.error) {
-                console.log(mediasoupParams.error)
-                return
-            }
+        console.log("signalNewConsumerTransport ", device);
 
-            console.log(device, remoteProducerId);
-            let consumerTransport
-            try {
-                consumerTransport = device.createRecvTransport(mediasoupParams)
-            } catch (error) {
-                console.log(error)
-                return
-            }
-            console.log("consumerTransport : " + consumerTransport);
-            consumerTransport.on('connect', async ({ dtlsParameters }: any, callback: any, errback: any) => {
-                try {
-                    await mediasoup.emit('transport-recv-connect', {
-                        dtlsParameters,
-                        serverConsumerTransportId: mediasoupParams.id,
-                    })
-                    callback()
-                } catch (error) {
-                    errback(error)
+        if(!consumerTransports.find((consumerTransport : any) => {
+            consumerTransport.producerId === remoteProducerId
+        }) && device) {
+            await mediasoup.emit('createWebRtcTransport', { consumer : true }, (mediasoupParams: any) => {
+                if (mediasoupParams.error) {
+                    console.log(mediasoupParams.error)
+                    return
                 }
-            });
-
-            connectRecvTransport(consumerTransport, remoteProducerId, mediasoupParams.id);
-        })
+    
+                console.log("createRecvTransport ", device, remoteProducerId);
+                let consumerTransport
+                try {
+                    consumerTransport = device.createRecvTransport(mediasoupParams)
+                } catch (error) {
+                    console.log(error)
+                    return
+                }
+                console.log("consumerTransport : " + consumerTransport);
+                consumerTransport.on('connect', async ({ dtlsParameters }: any, callback: any, errback: any) => {
+                    try {
+                        await mediasoup.emit('transport-recv-connect', {
+                            dtlsParameters,
+                            serverConsumerTransportId: mediasoupParams.id,
+                        })
+                        callback()
+                    } catch (error) {
+                        errback(error)
+                    }
+                });
+    
+                connectRecvTransport(consumerTransport, remoteProducerId, mediasoupParams.id);
+            })
+        }
     }
 
     const connectRecvTransport = async (consumerTransport: any, remoteProducerId: any, serverConsumerTransportId: any) => {
@@ -274,11 +265,18 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
 
             console.log("consumer-track", track);
         
-            if (videoRef.current) {
+            // if (videoRef.current) {
+            //     const mediaStream = new MediaStream();
+            //     mediaStream.addTrack(track);
+
+            //     videoRef.current.srcObject = mediaStream;
+            // }
+
+            const sibalVideo : any = document.getElementById('sibal');
+            if(sibalVideo) {
                 const mediaStream = new MediaStream();
                 mediaStream.addTrack(track);
-
-                videoRef.current.srcObject = mediaStream;
+                sibalVideo.srcObject = mediaStream;
             }
 
             mediasoup.emit('consumer-resume', { serverConsumerId: mediasoupParams.serverConsumerId })
@@ -338,6 +336,20 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
         setMessageContent("");
     };
 
+    const handleStartShare = () => {
+        console.log("startShare clicked")
+        getScreenShareStream();
+    };
+
+    const handleStartFace = () => {
+        console.log("startFace clicked")
+        getLocalStream();
+    }
+
+    const handleSireo = () => {
+        console.log("나도 싫어")
+    }
+
     return (
             <div className="chat-room">
                 <div className="chat-title">
@@ -347,7 +359,7 @@ const RoomPage = ({ params }: { params: { roomid: string } }) => {
                     <div id="video">
                         <video id="localVideo" autoPlay className="video" muted />
                         <video id="shareVideo" autoPlay className="video" muted />
-                        <video ref={videoRef} className="video" />
+                        <video id="sibal" autoPlay className="video" />
                     </div>
                     <CustomButton onClick={handleStartShare} buttonText="화면 공유 시작" />
                     <CustomButton onClick={handleStartFace} buttonText="얼굴 공유 시작" />

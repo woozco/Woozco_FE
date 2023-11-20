@@ -23,7 +23,7 @@ const BoardsPage: React.FC = () => {
     };
 
     return (
-        <div>
+        <div className="page-container">
                 <br></br>
                 {boardData.map((board) => (
                     <div className="post" key={board.id}>
