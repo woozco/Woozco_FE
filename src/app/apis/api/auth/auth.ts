@@ -1,11 +1,12 @@
 import { AxiosResponse } from 'axios';
 import apiInstance  from "../../utils/createAxioInstance";
-import { PostRegisterData, PostLoginData, PostChangePWData } from "./types"
+import { PostRegisterData, PostLoginData, PostChangePWData, PostVerifyEmail, PostConfirmVerify } from "./types"
 
-export async function postRegisterRequest(postRegisterData: PostRegisterData): Promise<void> {
+export async function postRegisterRequest(postRegisterData: PostRegisterData): Promise<AxiosResponse | undefined> {
   try {
     const response: AxiosResponse = await apiInstance.post('/api/auth/register', postRegisterData);
     console.log('POST 요청 성공:', response.data);
+    return response;
   } catch (error) {
     console.error('POST 요청 오류:', error);
   }
@@ -37,5 +38,27 @@ export async function getProfile(): Promise<AxiosResponse | undefined> {
   } catch (error) {
     console.error('GET Profile', error);
     return undefined; // 에러 발생 시 undefined 반환
+  }
+}
+
+export async function postVerifyEmailRequest(postVerifyEmail: PostVerifyEmail): Promise<AxiosResponse | undefined> {
+  try {
+    const response: AxiosResponse = await apiInstance.post('/api/auth/verifyemail', postVerifyEmail);
+    console.log('POST 요청 성공:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('POST 요청 오류:', error);
+    return undefined;
+  }
+}
+
+export async function postConfirmVerifyRequest(postConfirmVerify: PostConfirmVerify): Promise<AxiosResponse | undefined> {
+  try {
+    const response: AxiosResponse = await apiInstance.post('/api/auth/confirm-verifyemail', postConfirmVerify);
+    console.log('POST 요청 성공:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('POST 요청 오류:', error);
+    return undefined;
   }
 }
