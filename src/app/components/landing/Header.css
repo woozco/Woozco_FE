@@ -1,0 +1,77 @@
+.header {
+    height: 100vh; /* 원하는 높이로 조절 */
+    color: white; /* 텍스트 색상 */
+    display: flex; /* Flexbox를 사용 */
+    justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+}
+
+.background-video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 비디오가 섹션을 꽉 채우도록 */
+    opacity: 0.6; /* 희미한 효과 */
+}
+
+.overlay-content {
+    position: relative;
+    z-index: 1; /* 비디오 위에 오도록 */
+    text-align: center; /* 텍스트 가운데 정렬 */
+}
+
+.woozco {
+    font-size: 3rem; /* 예시로 3rem 설정 */
+    color: black; /* 검정색 */
+    font-family: "Arial", sans-serif; /* 폰트 변경, 예시로 Arial 사용 */
+}
+
+.woozco_under {
+    font-size: 1.5rem; /* h1의 절반 크기, 여기서는 1.5rem */
+    color: black; /* 검정색 */
+    /* 폰트 스타일이 필요하다면 여기에 추가 */
+}
+
+.woozico-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 12vh;
+}
+
+.woozico-text {
+    font-size: 7rem; /* 큰 글씨 크기 */
+    color: #1a1a1a; /* 진한 글씨색 */
+    font-family: "Arial", sans-serif; /* 폰트 */
+    text-transform: uppercase; /* 대문자 변환 */
+    animation: fadeIn 2s ease-in-out; /* 애니메이션 적용 */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* 텍스트 그림자 추가 */
+}
+
+.scroll-down-button {
+    background-image: url('./123.svg'); /* 이미지 URL */
+    background-size: cover; /* 이미지 크기 조정 */
+    background-repeat: no-repeat; /* 이미지 반복 방지 */
+    background-position: center; /* 이미지 위치 중앙 조정 */
+    border: none; /* 기본 테두리 제거 */
+    width: 50px; /* 버튼의 너비 */
+    height: 50px; /* 버튼의 높이 */
+    cursor: pointer; /* 마우스 오버 시 커서 변경 */
+    position: absolute;
+    bottom: 20px; /* 버튼 위치 조정 */
+    left: 50%;
+    transform: translateX(-50%); /* 가운데 정렬 */
+    /* 버튼 스타일링 */
+  }
+
+  
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

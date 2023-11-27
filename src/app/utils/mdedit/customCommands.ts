@@ -22,7 +22,7 @@ import {
     codeLive,
     codePreview,
     fullscreen,
-  } from "@uiw/react-md-editor/lib/commands";
+  } from "@uiw/react-md-editor";
   import onImagePasted from "@/app/components/mdedit/onImagePasted";
   
   export const customCommands = [
