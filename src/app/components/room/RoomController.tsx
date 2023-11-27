@@ -36,6 +36,7 @@ const RoomController: React.FC = () => {
     };
 
     const handleJoinRoom = async () => {
+        console.log("눌림")
         if (socket && roomName) {
             const doesRoomExist = await isRoomExistPromise(roomName);
             if (!doesRoomExist) {
