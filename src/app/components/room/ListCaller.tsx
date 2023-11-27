@@ -26,13 +26,7 @@ const ListCaller = () => {
     }, []);
 
     const joinRoom = (room: string): void => {
-<<<<<<< HEAD
-        socket.emit("joinRoom", room);
-        socket.emit("getClientsInRoom", room);
-        router.push(`/room/${room}`)
-=======
         window.location.href = 'https://woozco.com/sfu/' + room;
->>>>>>> e9ebc5d2077af62234dc790b01f2f78dfe0f0ab3
     };
 
     useEffect(() => {
@@ -44,10 +38,6 @@ const ListCaller = () => {
 
     return (
         <div>
-<<<<<<< HEAD
-            <br></br>
-=======
->>>>>>> e9ebc5d2077af62234dc790b01f2f78dfe0f0ab3
             <div className="list-container">
                 {rooms.map((name) => (
                     <div key={name} className="list-item">
