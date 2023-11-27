@@ -7,7 +7,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ scrollToRef }) => {
     const handleScroll = () => {
-      console.log("in")
+        console.log("in");
         if (scrollToRef.current) {
             scrollToRef.current.scrollIntoView({ behavior: "smooth" });
         }
@@ -27,6 +27,7 @@ const Header: React.FC<HeaderProps> = ({ scrollToRef }) => {
                 </div>
                 <p className="woozco_under">우리들의 지혜로운 교육 플랫폼</p>
             </div>
+            <img src="/logo_circle.png" alt="설명" className="top-right-image" />
             <button
                 className="scroll-down-button"
                 onClick={handleScroll}

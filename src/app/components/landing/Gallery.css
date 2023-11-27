@@ -1,0 +1,18 @@
+.image-gallery {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  
+  .image-gallery img {
+    max-width: 70rem; /* 이미지가 컨테이너를 넘치지 않도록 함 */
+    height: auto; /* 종횡비 유지 */
+    display: none;
+    transition: opacity 1s ease-in-out;
+  }
+  
+  .image-gallery img.active {
+    display: block;
+    opacity: 1;
+  }
+  

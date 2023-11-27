@@ -17,7 +17,6 @@ const InputOneLine: React.FC<InputOneLineProps> = ({
   name,
   value,
   onChange,
-  className,
   type="text",
   required = false,
 }) => {
