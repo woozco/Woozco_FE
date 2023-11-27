@@ -27,7 +27,7 @@ const RoomController: React.FC = () => {
         if (socket && roomName) {
             const doesRoomExist = await isRoomExistPromise(roomName);
             if (doesRoomExist) {
-                alert("방 이미 있음 ㅇㅇ");
+                alert("방 이미 존재합니다");
             } else {
                 socket.emit("createRoom", { roomName, maxMembers: 5 });
                 router.push(`/room/${roomName}`);
@@ -39,7 +39,7 @@ const RoomController: React.FC = () => {
         if (socket && roomName) {
             const doesRoomExist = await isRoomExistPromise(roomName);
             if (!doesRoomExist) {
-                alert("그런 방 없음 ㅇㅇ");
+                alert("방이 존재하지 않습니다");
             } else {
                 socket.emit("joinRoom", roomName);
                 socket.emit("getClientsInRoom", roomName);

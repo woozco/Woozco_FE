@@ -5,6 +5,7 @@ import { getAllBoard } from "../apis/api/board/board";
 import { PostBoardData } from "../apis/api/board/types";
 import Link from "next/link";
 import CustomButton from "../components/Custombutton";
+import MarkdownViewer from "../components/mdedit/MdViewer";
 
 const BoardsPage: React.FC = () => {
     const [boardData, setBoardData] = useState<PostBoardData[]>([]);
@@ -24,25 +25,26 @@ const BoardsPage: React.FC = () => {
 
     return (
         <div>
+            <Link href="/posting/writing">
+                <CustomButton buttonText="게시물 쓰기" />
+            </Link>
                 <br></br>
                 {boardData.map((board) => (
                     <div className="post" key={board.id}>
                         <div className="post-content">
                             <h2 className="post-author">{board.title}</h2>
                             <p className="post-text">{board.type}</p>
-                            <p className="post-text">{board.body}</p>
+                            <MarkdownViewer markdown={board.body}></MarkdownViewer>
                             <p className="post-text">{board.date}</p>
                             <p className="post-text">{board.startTime}</p>
                             <p className="post-text">{board.endTime}</p>
-                            <p className="post-text">{board.linkOfProblem}</p>
+                            <a className="post-text" href={board.linkOfProblem}>{board.linkOfProblem}</a>
                             <p className="post-text">{board.wantLanguage}</p>
                             <br></br>
                         </div>
                     </div>
                 ))}
-            <Link href="/posting/writing">
-                <CustomButton buttonText="게시물 쓰기" />
-            </Link>
+            
         </div>
     );
 };

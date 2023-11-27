@@ -7,6 +7,7 @@ interface InputOneLineProps {
   value: string;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   className: string;
+  type?: string; // 'type' 속성 추가
   required?: boolean;
 }
 
@@ -17,6 +18,7 @@ const InputOneLine: React.FC<InputOneLineProps> = ({
   value,
   onChange,
   className,
+  type="text",
   required = false,
 }) => {
   return (
@@ -25,12 +27,12 @@ const InputOneLine: React.FC<InputOneLineProps> = ({
         {label}:
       </label>
       <input
-        type="text"
+        type={type}
         id={id}
         name={name}
         value={value}
         onChange={onChange}
-        className={`w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500 ${className}`}
+        className={`w-full border rounded px-3 py-2 text-gray-600 focus:border-blue-500`}
         required={required}
       />
     </div>

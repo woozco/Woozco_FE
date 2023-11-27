@@ -1,19 +1,19 @@
-// VideoPlayer.tsx
 "use client";
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import ReactPlayer from 'react-player/lazy';
 
 const VideoPlayer = () => {
   const playerRef = useRef(null);
+  const [minutes, setMinutes] = useState(0); // 분 입력
+  const [seconds, setSeconds] = useState(0); // 초 입력
   const videoUrl = "https://woozco.s3.ap-northeast-2.amazonaws.com/video/id1/base.m3u8";
 
-  // 시간 배열 - 예를 들어 [60, 120, 180]은 각각 1분, 2분, 3분에 해당합니다.
-  const timeStamps = [60, 120, 180];
-
-  // 특정 시간으로 이동하는 함수
-  const handleSeek = (time) => {
+  // 분과 초를 합쳐서 총 초로 변환하고 해당 위치로 이동
+  const handleSeek = () => {
+    const totalTime = minutes * 60 + seconds;
+    console.log(playerRef.current)
     if (playerRef.current) {
-      playerRef.current.seekTo(time);
+      playerRef.current.seekTo(totalTime);
     }
   };
 
@@ -27,11 +27,19 @@ const VideoPlayer = () => {
         height="auto"
       />
       <div>
-        {timeStamps.map((time, index) => (
-          <button key={index} onClick={() => handleSeek(time)}>
-            {time}초로 이동
-          </button>
-        ))}
+        <input
+          type="number"
+          value={minutes}
+          onChange={(e) => setMinutes(parseInt(e.target.value))}
+          placeholder="분"
+        />
+        <input
+          type="number"
+          value={seconds}
+          onChange={(e) => setSeconds(parseInt(e.target.value))}
+          placeholder="초"
+        />
+        <button onClick={handleSeek}>이동</button>
       </div>
     </div>
   );

@@ -43,7 +43,8 @@
     "tailwindcss": "3.3.3",
     "typescript": "5.2.2",
     "utf-8-validate": "^5.0.10",
-    "video-react": "^0.16.0"
+    "video-react": "^0.16.0",
+    "zustand": "^4.4.6"
   },
   "devDependencies": {
     "@types/multer": "^1.4.10",

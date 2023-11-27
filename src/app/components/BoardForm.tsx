@@ -1,16 +1,17 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import Custombutton from "./Custombutton";
 import InputOneLine from "./InputOneLine";
 import { PostBoardData } from "../apis/api/board/types";
 import { postBoardRequest } from "../apis/api/board/board";
 import MdEditor from "./mdedit/MdEditor";
+import { useRouter } from "next/navigation";
+import "./BoardForm.css";
 
 const BoardForm: React.FC = () => {
-    const [responseMessage, setResponseMessage] = useState<string | null>(null);
+    const router = useRouter()
     const [formData, setFormData] = useState<PostBoardData>({
-        // Post 인터페이스로 타입 변경
-        id: 0, // 임시 값
+        id: 0,
         title: "",
         date: "",
         startTime: "",
@@ -20,32 +21,28 @@ const BoardForm: React.FC = () => {
         body: "",
         type: "",
     });
+    const [markdownContent, setMarkdownContent] = useState(""); // 별도의 상태로 Markdown 내용 관리
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+        const { name, value } = e.target;;
         setFormData({ ...formData, [name]: value });
     };
 
     const handleMarkdownChange = (value: string | undefined) => {
-        setFormData({ ...formData, body: value || "" });
+        setMarkdownContent(value || "");
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const finalFormData = { ...formData, body: markdownContent }; // 폼 데이터에 Markdown 내용 통합
         console.log(formData);
 
         try {
-            // postRegisterRequest 함수 호출
-            const response = await postBoardRequest(formData);
-
-            // 응답 정보를 상태에 저장
-            setResponseMessage(`POST 요청 성공: ${JSON.stringify(response)}`);
+            await postBoardRequest(finalFormData); // 수정된 데이터로 요청
         } catch (error) {
             console.error("POST 요청 오류:", error);
-
-            // 에러 메시지를 상태에 저장
-            setResponseMessage("POST 요청 오류");
         }
+        router.push("/")
     };
 
     return (
@@ -72,19 +69,47 @@ const BoardForm: React.FC = () => {
                         required
                     />
                     <div>
-                        <label htmlFor="date">날짜:</label>
-                        <input type="date" id="date" name="date" value={formData.date} onChange={handleInputChange} />
+                        <label htmlFor="date" className="label">
+                            날짜:
+                        </label>
+                        <input
+                            type="date"
+                            id="date"
+                            name="date"
+                            value={formData.date}
+                            onChange={handleInputChange}
+                            className="date-time-input"
+                        />
                     </div>
 
                     <div>
-                        <label htmlFor="startTime">시작 시간:</label>
-                        <input type="time" id="startTime" name="startTime" value={formData.startTime} onChange={handleInputChange} />
+                        <label htmlFor="startTime" className="label">
+                            시작 시간:
+                        </label>
+                        <input
+                            type="time"
+                            id="startTime"
+                            name="startTime"
+                            value={formData.startTime}
+                            onChange={handleInputChange}
+                            className="date-time-input"
+                        />
                     </div>
 
                     <div>
-                        <label htmlFor="endTime">종료 시간:</label>
-                        <input type="time" id="endTime" name="endTime" value={formData.endTime} onChange={handleInputChange} />
+                        <label htmlFor="endTime" className="label">
+                            종료 시간:
+                        </label>
+                        <input
+                            type="time"
+                            id="endTime"
+                            name="endTime"
+                            value={formData.endTime}
+                            onChange={handleInputChange}
+                            className="date-time-input"
+                        />
                     </div>
+
                     <InputOneLine
                         label="문제 링크"
                         id="linkOfProblem"
@@ -104,12 +129,11 @@ const BoardForm: React.FC = () => {
                         required
                     />
                 </div>
+                <div>본문:</div>
                 <MdEditor onMarkdownChange={handleMarkdownChange} />
-                <Custombutton buttonText="등록"/>
-                {responseMessage && (
-                    <p className="mt-4 text-green-600">{responseMessage}</p>
-                )}      
+                <Custombutton buttonText="등록" />
             </form>
+            <div></div>
         </div>
     );
 };
