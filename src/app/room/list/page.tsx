@@ -5,9 +5,11 @@ import { SocketContext, socket } from '../../apis/utils/socket.context';
 
 const page = () => {
   return (
-    <SocketContext.Provider value = {socket}>
-      <RoomController></RoomController>
-      <ListCaller></ListCaller>
+    <SocketContext.Provider value={socket}>
+      <div className="page-container">
+        <RoomController></RoomController>
+        <ListCaller></ListCaller>
+      </div>
     </SocketContext.Provider>
   )
 }

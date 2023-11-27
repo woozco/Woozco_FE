@@ -27,24 +27,21 @@ const RoomController: React.FC = () => {
         if (socket && roomName) {
             const doesRoomExist = await isRoomExistPromise(roomName);
             if (doesRoomExist) {
-                alert("방 이미 존재합니다");
+                alert("방 이미 있음 ㅇㅇ");
             } else {
                 socket.emit("createRoom", { roomName, maxMembers: 5 });
-                router.push(`/room/${roomName}`);
+                window.location.href = 'https://woozco.com/sfu/' + roomName;
             }
         }
     };
 
     const handleJoinRoom = async () => {
-        console.log("눌림")
         if (socket && roomName) {
             const doesRoomExist = await isRoomExistPromise(roomName);
             if (!doesRoomExist) {
-                alert("방이 존재하지 않습니다");
+                alert("그런 방 없음 ㅇㅇ");
             } else {
-                socket.emit("joinRoom", roomName);
-                socket.emit("getClientsInRoom", roomName);
-                router.push(`/room/${roomName}`);
+                window.location.href = 'https://woozco.com/sfu/' + roomName;
             }
         }
     };
