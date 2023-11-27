@@ -7,13 +7,19 @@ import RoomList from "../room/list/page";
 import Modal from "../components/Modal";
 import LoginForm from "./login/GoogleLoginButton";
 import useUserStore from "../store/useUserStore";
+import { useRouter } from "next/navigation";
+import "./TapLayout.css";
 
 const TapLayout = () => {
+    const router = useRouter();
     const [selectedTab, setSelectedTab] = useState("게시판");
     const [showModal, setShowModal] = useState(false);
-    const { isLogged, login, logout, username, profilePicture } =
-        useUserStore();
+    const { isLogged, logout, username, profilePicture } = useUserStore();
 
+    const defaultProfilePicture =
+        "https://woozco-picture.s3.ap-northeast-2.amazonaws.com/Default.png"; // 여기에 기본 이미지 경로 입력
+
+    console.log(profilePicture);
     const handleOpenModal = () => {
         setShowModal(true);
     };
@@ -22,6 +28,15 @@ const TapLayout = () => {
         setShowModal(false);
     };
 
+    const handleMoveMypage = () => {
+        router.push(
+            "/mypage/t9krr4tPCHS5RmWhirQgATTBHw0cKJKshAx89INoQOzuEXENTrx4R8rK1C00"
+        );
+    };
+
+    const handlelogout = () => {
+        logout();
+    };
     const getSelectedPageComponent = () => {
         switch (selectedTab) {
             case "게시판":
@@ -44,14 +59,42 @@ const TapLayout = () => {
                     <a>Woozco</a>
                 </div>
                 <div className="login-menu">
-                    <p>{isLogged ? "마이페이지" : <Custombutton
-                        buttonText="로그인"
-                        onClick={handleOpenModal}
-                    />}</p>
-                    <Link href="/register">
-                        <Custombutton buttonText="회원가입" />
-                    </Link>
-                    
+                    {isLogged ? (
+                        <>
+                            <Custombutton
+                                buttonText="마이페이지"
+                                onClick={handleMoveMypage}
+                            />
+                            <Custombutton
+                                buttonText="로그아웃"
+                                onClick={handlelogout}
+                            />
+                            <div className="user-info">
+                                <img
+                                    src={
+                                        profilePicture || defaultProfilePicture
+                                    }
+                                    alt="Profile"
+                                    style={{
+                                        width: "50px",
+                                        height: "50px",
+                                    }}
+                                />
+                                <span className="ml-2 mr-3">{username}</span>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <Link href="/register">
+                                <Custombutton buttonText="회원가입" />
+                            </Link>{" "}
+                            <Custombutton
+                                buttonText="로그인"
+                                onClick={handleOpenModal}
+                            />
+                        </>
+                    )}
+
                     {showModal && (
                         <Modal onClose={handleCloseModal}>
                             <LoginForm />

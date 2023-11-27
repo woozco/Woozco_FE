@@ -7,7 +7,6 @@ import { postdLoginRequest } from '../apis/api/auth/auth';
 
 const LoginForm: React.FC = () => {
   const [responseMessage, setResponseMessage] = useState<string | null>(null);
-  const REGISTERURL = "/register";
   const [formData, setFormData] = useState({
     id: '',
     password: '',

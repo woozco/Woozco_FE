@@ -9,12 +9,10 @@ const SuccessPage: React.FC = () => {
     const router = useRouter()
     useEffect(() => {
         const { jwt } = parseCookies();
-
+        console.log(jwt)
         if (jwt) {
             try {
                 const userData = JSON.parse(jwt);
-                console.log("사용자 데이터:", userData);
-
                 const { email, firstName, lastName, picture } = userData;
                 // Zustand를 사용하여 로그인 상태 업데이트
                 login(`${firstName} ${lastName}`, picture);
